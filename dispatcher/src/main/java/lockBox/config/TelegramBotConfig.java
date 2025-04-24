@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.generics.BotSession;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Configuration
-public class TelegramBotConfig {
+public class TelegramBotConfig {//bot registration
 
     private final TelegramBot telegramBot;
 
@@ -23,7 +23,7 @@ public class TelegramBotConfig {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             return telegramBotsApi.registerBot(telegramBot);
         } catch (TelegramApiException e) {
-            throw new RuntimeException("Ошибка регистрации Telegram бота", e);
+            throw new RuntimeException("Telegram bot registration error", e);
         }
     }
 }
