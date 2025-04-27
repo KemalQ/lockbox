@@ -10,7 +10,12 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -48,6 +53,20 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void sendAnswerMessage(SendMessage message) {
         if (message != null) {
             try{
+                ReplyKeyboardMarkup KeyboardMarkup = new ReplyKeyboardMarkup();
+                List<KeyboardRow> keyboard = new ArrayList<>();
+                KeyboardRow row = new KeyboardRow();
+                for(int i = 1; i <= 30; i++)
+                {
+                    row.add(String.valueOf(i));
+                    if (i%5 == 0){
+                        keyboard.add(row);
+                        row = new KeyboardRow();
+                    }
+                }
+                KeyboardMarkup.setKeyboard(keyboard);
+                message.setReplyMarkup(KeyboardMarkup);
+
                 execute(message);
             } catch (TelegramApiException e){
                 log.error(String.valueOf(e));

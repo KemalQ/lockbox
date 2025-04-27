@@ -23,7 +23,9 @@
 	</developers>
     <modules>
         <module>dispatcher</module>
-    </modules>
+		<module>common-rabbitmq</module>
+		<module>ImageProcessingService</module>
+	</modules>
     <scm>
 		<connection/>
 		<developerConnection/>
