@@ -3,6 +3,11 @@ package lockBox;
 import lockBox.Service.impl.ImageProcessingImpl;
 import lockBox.Service.impl.KohJao;
 import lockBox.Service.impl.TextProcessingImpl;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+
+import java.io.File;
+import java.util.List;
 
 import static lockBox.Utils.printMatrix.printMatrix;
 
@@ -51,7 +56,20 @@ public class Test {
                 {165, 170, 175, 85, 90, 100, 115, 120}
         };
 
+        File imageFile = new File("C:\\Users\\SHERFEDINOV KEMAL\\Desktop\\Colors\\canyon.jpg");
+
         ImageProcessingImpl imageProcessing = new ImageProcessingImpl();
+
+
+        var mat = imageProcessing.photoToMat(imageFile.getAbsolutePath());// returns mat object
+
+        var blueChannel = imageProcessing.getBlueChannel(mat);//returns blue channel
+
+        var array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
+
+        var arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//List<double[][]>
+
+
 
 //        System.out.println("DCT jTransform: ");
 //        var resultDct = imageProcessing.dct(input3);

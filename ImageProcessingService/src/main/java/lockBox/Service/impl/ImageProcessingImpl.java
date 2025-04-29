@@ -1,9 +1,14 @@
 package lockBox.Service.impl;
 
 import lockBox.Service.ImageProcessing;
+import lombok.Data;
 import org.jtransforms.dct.DoubleDCT_2D;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -13,8 +18,17 @@ import java.util.List;
  *
  *
  */
+@Data
+@Service
 public class ImageProcessingImpl implements ImageProcessing {
     private Mat image;
+    public ImageProcessingImpl(){
+    }
+
+    public Mat photoToMat(String filePath) {//for .png .jpg / .jpeg .bmp .tiff .webp
+        // Чтение изображения в цвете (3 канала: BGR)
+        return Imgcodecs.imread(filePath, Imgcodecs.IMREAD_COLOR);
+    }
 
     @Override
     public Mat getBlueChannel(Mat image) {
@@ -28,7 +42,7 @@ public class ImageProcessingImpl implements ImageProcessing {
         return channels.get(0);
     }
 
-    public double[][] matToIntArray(Mat blueChannel) {
+    public double[][] matToDoubleArray(Mat blueChannel) {
         int rows = blueChannel.rows();
         int cols = blueChannel.cols();
         double[][] result = new double[rows][cols];
@@ -40,7 +54,8 @@ public class ImageProcessingImpl implements ImageProcessing {
         }
         return result;
     }
-    public static List<double[][]> splitIntoArrayOfBlocks(double[][] channel) {
+
+    public List<double[][]> splitIntoArrayOfBlocks(double[][] channel) {
         int height = channel.length;
         int width = channel[0].length;
 
@@ -62,6 +77,39 @@ public class ImageProcessingImpl implements ImageProcessing {
         }
         return blocks;
     }
+    public double[][] mergeFromArrayOfBlocks(List<double[][]> blocks, int imageHeight, int imageWidth) {
+        double[][] channel = new double[imageHeight][imageWidth];
+        int blocksPerRow = imageWidth / 8;
+
+        for (int blockIndex = 0; blockIndex < blocks.size(); blockIndex++) {
+            double[][] block = blocks.get(blockIndex);
+
+            int blockRow = blockIndex / blocksPerRow;
+            int blockCol = blockIndex % blocksPerRow;
+
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    channel[blockRow * 8 + i][blockCol * 8 + j] = block[i][j];
+                }
+            }
+        }
+        return channel;
+    }
+
+    public Mat doubleArrayToMat(int[][] array) {//TODO остался на этом этапе
+        int rows = array.length;
+        int cols = array[0].length;
+        Mat mat = new Mat(rows, cols, CvType.CV_64F);
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                mat.put(i, j, array[i][j]);
+            }
+        }
+        return mat;
+    }
+
+
 
 
 
