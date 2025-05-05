@@ -56,7 +56,7 @@ public class Test {
                 {165, 170, 175, 85, 90, 100, 115, 120}
         };
 
-        File imageFile = new File("C:\\Users\\SHERFEDINOV KEMAL\\Desktop\\Colors\\canyon.jpg");
+
 
         ImageProcessingImpl imageProcessing = new ImageProcessingImpl();
 
