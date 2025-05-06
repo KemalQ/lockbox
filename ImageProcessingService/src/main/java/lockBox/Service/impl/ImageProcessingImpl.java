@@ -3,10 +3,17 @@ package lockBox.Service.impl;
 import lockBox.Service.ImageProcessing;
 import lombok.Data;
 import org.jtransforms.dct.DoubleDCT_2D;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
+
+import org.bytedeco.opencv.opencv_core.Mat;
+import static org.bytedeco.opencv.global.opencv_imgcodecs.*;
+import static org.bytedeco.opencv.global.opencv_core.*;
+
+import org.bytedeco.opencv.opencv_core.MatVector;
+//import org.bytedeco.opencv.opencv_core.DoublePointer;
+import org.bytedeco.javacpp.DoublePointer;
+
+
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,16 +34,16 @@ public class ImageProcessingImpl implements ImageProcessing {
 
     public Mat photoToMat(String filePath) {//for .png .jpg / .jpeg .bmp .tiff .webp
         // Чтение изображения в цвете (3 канала: BGR)
-        return Imgcodecs.imread(filePath, Imgcodecs.IMREAD_COLOR);
+        return imread(filePath, IMREAD_COLOR);
     }
 
-    @Override
+    //@Override
     public Mat getBlueChannel(Mat image) {
         // Создаём список для каналов
-        List<Mat> channels = new ArrayList<>();
+        MatVector channels = new MatVector();
 
         // Разделяем изображение на 3 канала (BGR)
-        Core.split(image, channels);//TODO задебажить
+        split(image, channels);//TODO задебажить
         // Возвращаем синий канал (индекс 0 в BGR)
         //var m = matToIntArray(channels.get(0));//TODO experiment check
         return channels.get(0);
@@ -49,11 +56,12 @@ public class ImageProcessingImpl implements ImageProcessing {
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                result[i][j] = blueChannel.get(i, j)[0];
+                result[i][j] = blueChannel.ptr(i, j).get() & 0xFF; // Получаем байт и преобразуем в unsigned
             }
         }
         return result;
     }
+
 
     public List<double[][]> splitIntoArrayOfBlocks(double[][] channel) {
         int height = channel.length;
@@ -96,14 +104,14 @@ public class ImageProcessingImpl implements ImageProcessing {
         return channel;
     }
 
-    public Mat doubleArrayToMat(int[][] array) {//TODO остался на этом этапе
+    public Mat doubleArrayToMat(double[][] array) {//TODO остался на этом этапе
         int rows = array.length;
         int cols = array[0].length;
-        Mat mat = new Mat(rows, cols, CvType.CV_64F);
+        Mat mat = new Mat(rows, cols, CV_64F);
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                mat.put(i, j, array[i][j]);
+                mat.ptr(i, j).putDouble(array[i][j]);
             }
         }
         return mat;
@@ -117,6 +125,13 @@ public class ImageProcessingImpl implements ImageProcessing {
     public double[][] dct(double[][] input){
         int rows = input.length;
         int cols = input[0].length;
+
+        for (int i = 0; i < input.length; i++) {
+            for (int j = 0; j < input[0].length; j++) {
+                input[i][j] -= 128;//centralization around 0
+            }
+        }
+
         // JTransforms требует 2D-массив в виде одномерного массива
         double[][] data = new double[rows][cols];
         for (int i = 0; i < rows; i++)
@@ -144,6 +159,13 @@ public class ImageProcessingImpl implements ImageProcessing {
 
         // Обратное DCT
         dct2d.inverse(data, true);
+
+        for (int i = 0; i < data.length; i++) {//TODO you can delete this block if don't want centralization
+            for (int j = 0; j < data[0].length; j++) {
+                data[i][j] += 128;//decentralization. 0-255
+                data[i][j] = Math.min(255, Math.max(0, data[i][j])); //защита от выхода за границы
+            }
+        }
         return data;
     }
 }

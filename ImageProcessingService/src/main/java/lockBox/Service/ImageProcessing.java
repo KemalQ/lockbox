@@ -1,6 +1,6 @@
 package lockBox.Service;
 
-import org.opencv.core.Mat;
+import org.bytedeco.opencv.opencv_core.Mat;
 
 import java.util.List;
 

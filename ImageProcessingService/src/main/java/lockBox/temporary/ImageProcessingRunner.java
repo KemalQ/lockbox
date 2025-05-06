@@ -1,18 +1,23 @@
-package lockBox;
+package lockBox.temporary;
 
 import lockBox.Service.impl.ImageProcessingImpl;
 import lockBox.Service.impl.KohJao;
-import lockBox.Service.impl.TextProcessingImpl;
-import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.List;
 
 import static lockBox.Utils.printMatrix.printMatrix;
 
-public class Test {
-    public static void main(String[] args) {
+@Component
+public class ImageProcessingRunner implements CommandLineRunner {
+    @Value("${image.file.path}")
+    File imageFile;
+    ImageProcessingImpl imageProcessing;
+
+    @Override
+    public void run(String... args) throws Exception {
         double[][] input = {
                 {239, 246, 255, 255, 239, 235, 242, 230},
                 {255, 253, 255, 255, 251, 243, 250, 244},
@@ -57,34 +62,27 @@ public class Test {
         };
 
 
-
-        ImageProcessingImpl imageProcessing = new ImageProcessingImpl();
-
-
-        var mat = imageProcessing.photoToMat(imageFile.getAbsolutePath());// returns mat object
-
-        var blueChannel = imageProcessing.getBlueChannel(mat);//returns blue channel
-
-        var array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
-
-        var arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//List<double[][]>
+//
+//        var mat = imageProcessing.photoToMat(imageFile.getAbsolutePath());// returns mat object
+//        var blueChannel = imageProcessing.getBlueChannel(mat);//returns blue channel
+//        var array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
+//        var arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
 
 
 
 //        System.out.println("DCT jTransform: ");
-//        var resultDct = imageProcessing.dct(input3);
+//        var resultDct = imageProcessing.dct(input);
 //        printMatrix(resultDct);
 //
 //        System.out.println("IDCT jTransform: ");
 //        var resultIdct = imageProcessing.idct(resultDct);
 //        printMatrix(resultIdct);
 //
-//        System.out.println("Обычная проверка работы кода внедрения. After embding: ");
-//        KohJao kohJao = new KohJao();
-//        double[][] resultKoh = kohJao.embedBitInBlock(input3, true);
-//        printMatrix(resultKoh);
-//        System.out.println(kohJao.extractBitFromBlock(resultKoh));
-
+        System.out.println("Обычная проверка работы кода внедрения. After embding: ");//TODO когда сравниваю не использовать матрицу из верхнего кода, так как она уже изменена
+        KohJao kohJao = new KohJao();
+        double[][] resultKoh = kohJao.embedBitInBlock(input, false);
+        printMatrix(resultKoh);
+        System.out.println(kohJao.extractBitFromBlock(resultKoh));
 
         //TODO for ASCII format
 //        boolean[] bits = {
@@ -104,8 +102,6 @@ public class Test {
 //        boolean[] bitsFromString = textProcessing.bitStringToBitArray(bitString);
 //        String result = textProcessing.bitsToAscii(bitsFromString);
 //        System.out.println("Строка битов как ASCII: " + textProcessing.binaryToString(bitString));
-
-
     }
 }
 

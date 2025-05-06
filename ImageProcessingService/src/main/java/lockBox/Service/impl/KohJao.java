@@ -1,5 +1,7 @@
 package lockBox.Service.impl;
 
+import static lockBox.Utils.printMatrix.printMatrix;
+
 public class KohJao {
     /**
      * Встраивает один бит информации в блок изображения 8x8 пикселей
@@ -13,9 +15,12 @@ public class KohJao {
     ImageProcessingImpl imageProcessing = new ImageProcessingImpl();
 
     public double[][] embedBitInBlock(double[][] block, boolean bit) {
+        System.out.println("Matrix before DCT:");//TODO delete after checking
+        printMatrix(block);//TODO delete after checking
         // 1. Применяю DCT к блоку 8x8
         double[][] dctCoefficients = imageProcessing.dct(block);
-
+        System.out.println("DCT coefficents in KohJao:");//TODO delete after checking
+        printMatrix(dctCoefficients);//TODO delete after checking
         // 2. Рассчитываю разницу между выбранными коэффициентами
         double k = Math.abs(dctCoefficients[4][5]) - Math.abs(dctCoefficients[5][4]);
 
@@ -33,7 +38,8 @@ public class KohJao {
                 dctCoefficients[5][4] = sign * (Math.abs(dctCoefficients[4][5]) + 35);
             }
         }
-
+        System.out.println("After embedding: " + bit);//TODO delete after checking
+        printMatrix(dctCoefficients);//TODO delete after checking
         // 4. Применить обратное DCT для получения модифицированного блока
         return imageProcessing.idct(dctCoefficients);
     }
