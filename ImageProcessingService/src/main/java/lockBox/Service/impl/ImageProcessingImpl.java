@@ -2,6 +2,7 @@ package lockBox.Service.impl;
 
 import lockBox.Service.ImageProcessing;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.jtransforms.dct.DoubleDCT_2D;
 
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -25,17 +26,20 @@ import java.util.List;
  *
  *
  */
+@Slf4j
 @Data
 @Service
 public class ImageProcessingImpl implements ImageProcessing {
     private Mat image;
 
-    public ImageProcessingImpl(){
-    }
-
     public Mat photoToMat(String filePath) {//for .png .jpg / .jpeg .bmp .tiff .webp
         // Чтение изображения в цвете (3 канала: BGR)
-        return imread(filePath, IMREAD_COLOR);
+        Mat matImage = imread(filePath, IMREAD_COLOR);
+        if (matImage.empty()){
+            throw new RuntimeException("Failed to load image: " + filePath);
+        }
+        log.atError();
+        return matImage;
     }
 
     //@Override

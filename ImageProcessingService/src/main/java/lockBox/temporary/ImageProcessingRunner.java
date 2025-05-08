@@ -2,6 +2,7 @@ package lockBox.temporary;
 
 import lockBox.Service.impl.ImageProcessingImpl;
 import lockBox.Service.impl.KohJao;
+import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,8 @@ import static lockBox.Utils.printMatrix.printMatrix;
 @Component
 public class ImageProcessingRunner implements CommandLineRunner {
     @Value("${image.file.path}")
-    File imageFile;
+    private String imageFilePath;
+
     ImageProcessingImpl imageProcessing;
 
     ImageProcessingRunner(ImageProcessingImpl imageProcessing){
@@ -64,10 +66,14 @@ public class ImageProcessingRunner implements CommandLineRunner {
                 {160, 165, 170, 80, 85, 95, 105, 110},
                 {165, 170, 175, 85, 90, 100, 115, 120}
         };
+        File imageFile = new File(imageFilePath);
+        if (!imageFile.exists()) {
+            throw new IllegalArgumentException("File was not found: " + imageFile.getAbsolutePath());
+        }
 
-        var mat = imageProcessing.photoToMat(imageFile.getAbsolutePath());// returns mat object
+        Mat mat = imageProcessing.photoToMat(imageFile.getAbsolutePath());// returns mat object
 
-        var blueChannel = imageProcessing.getBlueChannel(mat);//returns blue channel
+        Mat blueChannel = imageProcessing.getBlueChannel(mat);//returns blue channel
         var array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
         var arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
 
