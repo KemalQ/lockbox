@@ -16,6 +16,10 @@ public class ImageProcessingRunner implements CommandLineRunner {
     File imageFile;
     ImageProcessingImpl imageProcessing;
 
+    ImageProcessingRunner(ImageProcessingImpl imageProcessing){
+        this.imageProcessing = imageProcessing;
+    }
+
     @Override
     public void run(String... args) throws Exception {
         double[][] input = {
@@ -61,12 +65,11 @@ public class ImageProcessingRunner implements CommandLineRunner {
                 {165, 170, 175, 85, 90, 100, 115, 120}
         };
 
+        var mat = imageProcessing.photoToMat(imageFile.getAbsolutePath());// returns mat object
 
-//
-//        var mat = imageProcessing.photoToMat(imageFile.getAbsolutePath());// returns mat object
-//        var blueChannel = imageProcessing.getBlueChannel(mat);//returns blue channel
-//        var array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
-//        var arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
+        var blueChannel = imageProcessing.getBlueChannel(mat);//returns blue channel
+        var array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
+        var arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
 
 
 
@@ -78,11 +81,11 @@ public class ImageProcessingRunner implements CommandLineRunner {
 //        var resultIdct = imageProcessing.idct(resultDct);
 //        printMatrix(resultIdct);
 //
-        System.out.println("Обычная проверка работы кода внедрения. After embding: ");//TODO когда сравниваю не использовать матрицу из верхнего кода, так как она уже изменена
-        KohJao kohJao = new KohJao();
-        double[][] resultKoh = kohJao.embedBitInBlock(input, false);
-        printMatrix(resultKoh);
-        System.out.println(kohJao.extractBitFromBlock(resultKoh));
+//        System.out.println("Обычная проверка работы кода внедрения. After embding: ");//TODO когда сравниваю не использовать матрицу из верхнего кода, так как она уже изменена
+//        KohJao kohJao = new KohJao();
+//        double[][] resultKoh = kohJao.embedBitInBlock(input, false);
+//        printMatrix(resultKoh);
+//        System.out.println(kohJao.extractBitFromBlock(resultKoh));
 
         //TODO for ASCII format
 //        boolean[] bits = {

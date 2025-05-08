@@ -29,6 +29,7 @@ import java.util.List;
 @Service
 public class ImageProcessingImpl implements ImageProcessing {
     private Mat image;
+
     public ImageProcessingImpl(){
     }
 
