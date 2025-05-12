@@ -46,9 +46,17 @@ public class ImageProcessingImpl implements ImageProcessing {
     public Mat getBlueChannel(Mat image) {
         // Создаём список для каналов
         MatVector channels = new MatVector();
+        try{
+            if (image.empty()){
+                throw new RuntimeException("Mat image is empty, check the code flow!");
+            }
+            // Разделяем изображение на 3 канала (BGR)
+            split(image, channels);//TODO задебажить
+        }
+        catch (Exception e){
+            log.info(e.getMessage());
+        }
 
-        // Разделяем изображение на 3 канала (BGR)
-        split(image, channels);//TODO задебажить
         // Возвращаем синий канал (индекс 0 в BGR)
         //var m = matToIntArray(channels.get(0));//TODO experiment check
         return channels.get(0);

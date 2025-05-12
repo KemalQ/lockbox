@@ -13,9 +13,11 @@ import static lockBox.RabbitQueue.ANSWER_MESSAGE;
 @Service
 public class AnswerConsumerImpl implements AnswerConsumer {
     private final UpdateController updateController;//UpdateProcessor->UpdateController
+
     public AnswerConsumerImpl(UpdateController updateController) {
         this.updateController = updateController;
     }
+
     @Override
     @RabbitListener(queues = ANSWER_MESSAGE)
     public void consume(SendMessage sendMessage) {
