@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.List;
 
+import static lockBox.Utils.SecureRandomStringGenerator.generateRandomString;
 import static lockBox.Utils.printMatrix.printMatrix;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.imwrite;
 
@@ -82,7 +83,10 @@ public class ImageProcessingRunner implements CommandLineRunner {
         for (int i = 0; i<arrayOfBlocks.size(); i++){
             arrayOfBlocks.set(i, kohJao.embedBitInBlock(arrayOfBlocks.get(i), false));
 
-            System.out.print(kohJao.extractBitFromBlock(arrayOfBlocks.get(i)));
+            if (array.length==i){//TODO delete after testing extracted bits
+                System.out.println("");
+            }
+            System.out.print(kohJao.extractBitFromBlock(arrayOfBlocks.get(i))+"  ");
         }
 
         double[][] imageArray = imageProcessing.mergeFromArrayOfBlocks(arrayOfBlocks, array.length, array[0].length);//TODO 14.05.2025 debug
@@ -91,7 +95,7 @@ public class ImageProcessingRunner implements CommandLineRunner {
 
         Mat finalImage = imageProcessing.replaceBlueChannel(mat, modifiedBlue);//TODO 14.05.2025 debug
 
-        String path = System.getProperty("user.home") + "/Desktop/final.png";
+        String path = System.getProperty("user.home") + "/Desktop/"+ generateRandomString(16) + ".png";
         imwrite(path, finalImage);
         System.out.println("Saved: " + path);
 
