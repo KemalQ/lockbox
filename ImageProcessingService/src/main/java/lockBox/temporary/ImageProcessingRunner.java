@@ -8,8 +8,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.List;
 
 import static lockBox.Utils.printMatrix.printMatrix;
+import static org.bytedeco.opencv.global.opencv_imgcodecs.imwrite;
 
 @Component
 public class ImageProcessingRunner implements CommandLineRunner {
@@ -72,11 +74,26 @@ public class ImageProcessingRunner implements CommandLineRunner {
         }
 
         Mat mat = imageProcessing.photoToMat(imageFile.getAbsolutePath());// returns mat object
-
         Mat blueChannel = imageProcessing.getBlueChannel(mat);//returns blue channel
-        var array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
-        var arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
+        double[][] array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
+        List<double[][]> arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
 
+        KohJao kohJao = new KohJao();
+        for (int i = 0; i<arrayOfBlocks.size(); i++){
+            arrayOfBlocks.set(i, kohJao.embedBitInBlock(arrayOfBlocks.get(i), false));
+
+            System.out.print(kohJao.extractBitFromBlock(arrayOfBlocks.get(i)));
+        }
+
+        double[][] imageArray = imageProcessing.mergeFromArrayOfBlocks(arrayOfBlocks, array.length, array[0].length);//TODO 14.05.2025 debug
+
+        Mat modifiedBlue = imageProcessing.doubleArrayToMat2(imageArray);//TODO 14.05.2025 debug
+
+        Mat finalImage = imageProcessing.replaceBlueChannel(mat, modifiedBlue);//TODO 14.05.2025 debug
+
+        String path = System.getProperty("user.home") + "/Desktop/final.png";
+        imwrite(path, finalImage);
+        System.out.println("Saved: " + path);
 
 
 //        System.out.println("DCT jTransform: ");

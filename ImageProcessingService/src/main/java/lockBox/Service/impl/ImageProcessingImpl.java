@@ -2,7 +2,9 @@ package lockBox.Service.impl;
 
 import lockBox.Service.ImageProcessing;
 import lombok.Data;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.bytedeco.javacpp.indexer.UByteRawIndexer;
 import org.jtransforms.dct.DoubleDCT_2D;
 
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -10,10 +12,6 @@ import static org.bytedeco.opencv.global.opencv_imgcodecs.*;
 import static org.bytedeco.opencv.global.opencv_core.*;
 
 import org.bytedeco.opencv.opencv_core.MatVector;
-//import org.bytedeco.opencv.opencv_core.DoublePointer;
-import org.bytedeco.javacpp.DoublePointer;
-
-
 
 import org.springframework.stereotype.Service;
 
@@ -28,6 +26,7 @@ import java.util.List;
  */
 @Slf4j
 @Data
+@ToString(exclude = "image")
 @Service
 public class ImageProcessingImpl implements ImageProcessing {
     private Mat image;
@@ -42,7 +41,6 @@ public class ImageProcessingImpl implements ImageProcessing {
         return matImage;
     }
 
-    //@Override
     public Mat getBlueChannel(Mat image) {
         // Создаём список для каналов
         MatVector channels = new MatVector();
@@ -59,7 +57,7 @@ public class ImageProcessingImpl implements ImageProcessing {
 
         // Возвращаем синий канал (индекс 0 в BGR)
         //var m = matToIntArray(channels.get(0));//TODO experiment check
-        return channels.get(0);
+        return channels.get(0).clone();//использовал клон для исключения проблемы с исчезновением Mat из памяти
     }
 
     public double[][] matToDoubleArray(Mat blueChannel) {
@@ -67,10 +65,20 @@ public class ImageProcessingImpl implements ImageProcessing {
         int cols = blueChannel.cols();
         double[][] result = new double[rows][cols];
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                result[i][j] = blueChannel.ptr(i, j).get() & 0xFF; // Получаем байт и преобразуем в unsigned
+        UByteRawIndexer indexer = blueChannel.createIndexer();
+        try{
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    result[i][j] = indexer.get(i, j); // Получаем значение по указателю
+                }
             }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            log.atError();
+        }
+        finally {
+            indexer.release();//освобождаем память, всегда использовать
         }
         return result;
     }
@@ -84,20 +92,34 @@ public class ImageProcessingImpl implements ImageProcessing {
         int blocksPerCol = height / 8;
 
         List<double[][]> blocks = new ArrayList<>();
-        //TODO проверить разбил ли массив на блоки с шагом 8 блоков
-        for (int blockRow = 0; blockRow < blocksPerCol; blockRow++) {
-            for (int blockCol = 0; blockCol < blocksPerRow; blockCol++) {
-                double[][] block = new double[8][8];
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) {
-                        block[i][j] = channel[blockRow * 8 + i][blockCol * 8 + j];
+
+        log.info("Adjusted dimensions to {}x{} (was {}x{})",
+                blocksPerCol, blocksPerRow, height, width);
+
+        try{
+            //TODO проверить разбил ли массив на блоки с шагом 8 блоков
+            for (int blockRow = 0; blockRow < blocksPerCol; blockRow++) {
+                for (int blockCol = 0; blockCol < blocksPerRow; blockCol++) {
+                    double[][] block = new double[8][8];
+                    for (int i = 0; i < 8; i++) {
+                        for (int j = 0; j < 8; j++) {
+                            block[i][j] = channel[blockRow * 8 + i][blockCol * 8 + j];
+                        }
                     }
+                    blocks.add(block);
                 }
-                blocks.add(block);
             }
         }
+        catch (Exception e){
+            e.printStackTrace();
+            log.atError();
+        }
+
+        log.info("Created {} blocks of 8x8", blocks.size());
+
         return blocks;
     }
+
     public double[][] mergeFromArrayOfBlocks(List<double[][]> blocks, int imageHeight, int imageWidth) {
         double[][] channel = new double[imageHeight][imageWidth];
         int blocksPerRow = imageWidth / 8;
@@ -130,9 +152,37 @@ public class ImageProcessingImpl implements ImageProcessing {
         return mat;
     }
 
+    public Mat doubleArrayToMat2(double[][] array) {//TODO 14.05.2025 degub this code
+        int rows = array.length;
+        int cols = array[0].length;
+        Mat mat = new Mat(rows, cols, CV_8UC1);//created with integer values
 
+        UByteRawIndexer indexer = mat.createIndexer();
+        try {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    int value = (int) Math.round(array[i][j]);
+                    value = Math.max(0, Math.min(255, value));
+                    indexer.put(i, j, value);
+                }
+            }
+        } finally {
+            indexer.release();
+        }
 
+        return mat;
+    }
 
+    public Mat replaceBlueChannel(Mat originalColorImage, Mat newBlueChannel){//TODO 14.05.2025 degub this code
+        MatVector channels = new MatVector();
+        split(originalColorImage, channels);
+
+        channels.put(0, newBlueChannel); // 0 — синий, 1 — зелёный, 2 — красный
+
+        Mat merged = new Mat();
+        merge(channels, merged);
+        return merged;
+    }
 
     @Override
     public double[][] dct(double[][] input){
