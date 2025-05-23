@@ -27,16 +27,7 @@ public class ImageProcessingRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        double[][] input = {
-                {239, 246, 255, 255, 239, 235, 242, 230},
-                {255, 253, 255, 255, 251, 243, 250, 244},
-                {255, 255, 254, 255, 253, 244, 252, 250},
-                {251, 207, 198, 225, 235, 239, 250, 252},
-                {192, 149, 135, 167, 199, 227, 246, 255},
-                {177, 152, 129, 132, 160, 201, 233, 245},
-                {183, 190, 158, 119, 122, 166, 210, 237},
-                {167, 198, 167, 103, 91, 137, 195, 234}
-        };
+
         double[][] input1 = {
                 {120, 132, 145, 140, 138, 150, 155, 160},
                 {125, 130, 142, 148, 152, 158, 162, 165},
@@ -46,28 +37,6 @@ public class ImageProcessingRunner implements CommandLineRunner {
                 {160, 165, 170, 175, 180, 185, 190, 195},
                 {165, 170, 175, 182, 188, 192, 198, 202},
                 {170, 175, 180, 185, 190, 195, 205, 210}
-        };
-
-        double[][] input2 = {
-                {200, 210, 215, 220, 215, 208, 205, 210},
-                {205, 215, 220, 225, 218, 210, 208, 212},
-                {210, 218, 225, 228, 220, 215, 210, 215},
-                {215, 220, 228, 230, 225, 220, 215, 218},
-                {212, 215, 222, 225, 220, 218, 212, 215},
-                {208, 210, 215, 220, 218, 215, 210, 208},
-                {205, 208, 212, 215, 212, 210, 205, 202},
-                {200, 205, 208, 210, 208, 205, 200, 198}
-        };
-
-        double[][] input3 = {
-                {50, 55, 60, 150, 155, 160, 165, 170},
-                {52, 58, 65, 155, 160, 165, 170, 175},
-                {55, 62, 70, 160, 165, 170, 175, 180},
-                {60, 65, 75, 165, 170, 175, 180, 185},
-                {150, 155, 160, 70, 75, 80, 85, 90},
-                {155, 160, 165, 75, 80, 90, 95, 100},
-                {160, 165, 170, 80, 85, 95, 105, 110},
-                {165, 170, 175, 85, 90, 100, 115, 120}
         };
         File imageFile = new File(imageFilePath);
         if (!imageFile.exists()) {
@@ -79,6 +48,7 @@ public class ImageProcessingRunner implements CommandLineRunner {
         double[][] array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
         List<double[][]> arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
 
+        //TODO внедряем 0 в фото подряд во все блоки
         KohJao kohJao = new KohJao();
         for (int i = 0; i<arrayOfBlocks.size(); i++){
             arrayOfBlocks.set(i, kohJao.embedBitInBlock(arrayOfBlocks.get(i), false));
@@ -95,7 +65,7 @@ public class ImageProcessingRunner implements CommandLineRunner {
 
         Mat finalImage = imageProcessing.replaceBlueChannel(mat, modifiedBlue);//TODO 14.05.2025 debug
 
-        String path = System.getProperty("user.home") + "/Desktop/"+ generateRandomString(16) + ".png";
+        String path = System.getProperty("user.home") + "/Desktop/OutputFiles/"+ generateRandomString(16) + ".jpeg";
         imwrite(path, finalImage);
         System.out.println("Saved: " + path);
 
@@ -144,4 +114,17 @@ public class ImageProcessingRunner implements CommandLineRunner {
   [177, 152, 129, 132, 160, 201, 233, 245],
   [183, 190, 158, 119, 122, 166, 210, 237],
   [167, 198, 167, 103, 91, 137, 195, 234] ]
+ */
+
+/*
+        double[][] input = {
+                {239, 246, 255, 255, 239, 235, 242, 230},
+                {255, 253, 255, 255, 251, 243, 250, 244},
+                {255, 255, 254, 255, 253, 244, 252, 250},
+                {251, 207, 198, 225, 235, 239, 250, 252},
+                {192, 149, 135, 167, 199, 227, 246, 255},
+                {177, 152, 129, 132, 160, 201, 233, 245},
+                {183, 190, 158, 119, 122, 166, 210, 237},
+                {167, 198, 167, 103, 91, 137, 195, 234}
+        };
  */
