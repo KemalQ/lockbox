@@ -5,6 +5,7 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import java.util.List;
 
 public interface ImageProcessing {
+    Mat photoToMat(String filePath);
     Mat getBlueChannel(Mat image);
 
     double[][] matToDoubleArray(Mat blueChannel);

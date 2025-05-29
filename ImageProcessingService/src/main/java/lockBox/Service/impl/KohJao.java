@@ -78,5 +78,4 @@ public class KohJao {
         }
         return copy;
     }
-
 }

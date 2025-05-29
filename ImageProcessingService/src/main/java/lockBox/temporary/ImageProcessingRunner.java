@@ -1,7 +1,7 @@
 package lockBox.temporary;
 
+import lockBox.Service.embedingMethods.MethodEmbedding;
 import lockBox.Service.impl.ImageProcessingImpl;
-import lockBox.Service.impl.KohJao;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -11,7 +11,6 @@ import java.io.File;
 import java.util.List;
 
 import static lockBox.Utils.SecureRandomStringGenerator.generateRandomString;
-import static lockBox.Utils.printMatrix.printMatrix;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.imwrite;
 
 @Component
@@ -19,10 +18,15 @@ public class ImageProcessingRunner implements CommandLineRunner {
     @Value("${image.file.path}")
     private String imageFilePath;
 
+    @Value("${image.file.pathDecode}")
+    private String fileToDecode;
+
+    MethodEmbedding methodOne;
     ImageProcessingImpl imageProcessing;
 
-    ImageProcessingRunner(ImageProcessingImpl imageProcessing){
+    ImageProcessingRunner(ImageProcessingImpl imageProcessing, MethodEmbedding methodOne){
         this.imageProcessing = imageProcessing;
+        this.methodOne = methodOne;
     }
 
     @Override
@@ -49,15 +53,18 @@ public class ImageProcessingRunner implements CommandLineRunner {
         List<double[][]> arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
 
         //TODO внедряем 0 в фото подряд во все блоки
-        KohJao kohJao = new KohJao();
-        for (int i = 0; i<arrayOfBlocks.size(); i++){
-            arrayOfBlocks.set(i, kohJao.embedBitInBlock(arrayOfBlocks.get(i), false));
+//        KohJao kohJao = new KohJao();
+//        for (int i = 0; i<arrayOfBlocks.size(); i++){
+//            arrayOfBlocks.set(i, kohJao.embedBitInBlock(arrayOfBlocks.get(i), false));
+//
+//            if (array.length==i){//TODO delete after testing extracted bits
+//                System.out.println("");
+//            }
+//            System.out.print(kohJao.extractBitFromBlock(arrayOfBlocks.get(i))+"  ");
+//        }
 
-            if (array.length==i){//TODO delete after testing extracted bits
-                System.out.println("");
-            }
-            System.out.print(kohJao.extractBitFromBlock(arrayOfBlocks.get(i))+"  ");
-        }
+        arrayOfBlocks = methodOne.embeddingMethodOne(arrayOfBlocks, "Kemal tezce bu projeyi bitir");
+
 
         double[][] imageArray = imageProcessing.mergeFromArrayOfBlocks(arrayOfBlocks, array.length, array[0].length);//TODO 14.05.2025 debug
 
@@ -68,6 +75,19 @@ public class ImageProcessingRunner implements CommandLineRunner {
         String path = System.getProperty("user.home") + "/Desktop/OutputFiles/"+ generateRandomString(16) + ".jpeg";
         imwrite(path, finalImage);
         System.out.println("Saved: " + path);
+
+
+        //Extracting text from photo
+        File imageFileDecode = new File(fileToDecode);
+        if (!imageFileDecode.exists()) {
+            throw new IllegalArgumentException("File was not found: " + imageFileDecode.getAbsolutePath());
+        }
+        Mat matDecode = imageProcessing.photoToMat(imageFileDecode.getAbsolutePath());// returns mat object
+        Mat blueChannelDecode = imageProcessing.getBlueChannel(mat);//returns blue channel
+        double[][] arrayDecode = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
+        List<double[][]> arrayOfBlocksDecode = imageProcessing.splitIntoArrayOfBlocks(array);
+        System.out.println(methodOne.extractingMethodOne(arrayOfBlocksDecode));
+
 
 
 //        System.out.println("DCT jTransform: ");
