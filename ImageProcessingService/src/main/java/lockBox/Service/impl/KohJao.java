@@ -26,13 +26,13 @@ public class KohJao {
 
         // 3. Модифицирую коэффициенты в зависимости от бита
         if (bit) { // Если нужно встроить 1
-            if (k <= 25) {
+            if (k <= 15) {
                 // Первый коэффициент делаем существенно больше второго
                 double sign = dctCoefficients[4][5] >= 0 ? 1.0 : -1.0;
                 dctCoefficients[4][5] = sign * (Math.abs(dctCoefficients[5][4]) + 35);
             }
         } else { // Если нужно встроить 0
-            if (k >= -25) {
+            if (k >= -15) {
                 // Второй коэффициент делаю существенно больше первого
                 double sign = dctCoefficients[5][4] >= 0 ? 1.0 : -1.0;
                 dctCoefficients[5][4] = sign * (Math.abs(dctCoefficients[4][5]) + 35);
@@ -59,10 +59,10 @@ public class KohJao {
         double k = Math.abs(dctCoefficients[4][5]) - Math.abs(dctCoefficients[5][4]);
 
         // 3. Интерпретировал разницу как бит
-        if (k >= 25) {
+        if (k >= 15) {
             return true;  // бит = 1
         }
-        else if (k <= -25) {
+        else if (k <= -15) {
             return false; // бит = 0
         }
         else {

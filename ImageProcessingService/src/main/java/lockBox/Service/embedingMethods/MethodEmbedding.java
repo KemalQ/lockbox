@@ -31,10 +31,10 @@ public class MethodEmbedding {
             if (bit==0){
                 arrayOfBlocks.set(3 + i, kohJao.embedBitInBlock(arrayOfBlocks.get(3 + i), false));//starts from 3 block
             }
-            else arrayOfBlocks.set(i, kohJao.embedBitInBlock(arrayOfBlocks.get(3 + i), true));//starts from 3 block
+            else arrayOfBlocks.set(3+ i, kohJao.embedBitInBlock(arrayOfBlocks.get(3 + i), true));//starts from 3 block
         }
 
-        // 3. Внедряем само сообщение
+        // 3. Внедряею само сообщение
         for (int i = 0; i < binaryMessage.length(); i++) {
             int bit = Character.getNumericValue(binaryMessage.charAt(i));
             if (bit==0){

@@ -2,6 +2,7 @@ package lockBox.temporary;
 
 import lockBox.Service.embedingMethods.MethodEmbedding;
 import lockBox.Service.impl.ImageProcessingImpl;
+import lockBox.Service.impl.KohJao;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -42,6 +43,8 @@ public class ImageProcessingRunner implements CommandLineRunner {
 //                {165, 170, 175, 182, 188, 192, 198, 202},
 //                {170, 175, 180, 185, 190, 195, 205, 210}
 //        };
+
+        // 1. Embedding text to photo
         File imageFile = new File(imageFilePath);
         if (!imageFile.exists()) {
             throw new IllegalArgumentException("File was not found: " + imageFile.getAbsolutePath());
@@ -52,19 +55,18 @@ public class ImageProcessingRunner implements CommandLineRunner {
         double[][] array = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
         List<double[][]> arrayOfBlocks = imageProcessing.splitIntoArrayOfBlocks(array);//transforms double[][] to List<double[][]>
 
-        //TODO внедряем 0 в фото подряд во все блоки
-//        KohJao kohJao = new KohJao();
-//        for (int i = 0; i<arrayOfBlocks.size(); i++){
-//            arrayOfBlocks.set(i, kohJao.embedBitInBlock(arrayOfBlocks.get(i), false));
-//
-//            if (array.length==i){//TODO delete after testing extracted bits
-//                System.out.println("");
-//            }
-//            System.out.print(kohJao.extractBitFromBlock(arrayOfBlocks.get(i))+"  ");
-//        }
+        arrayOfBlocks = methodOne.embeddingMethodOne(arrayOfBlocks, "Checking ukrainian symbols, ну коли вже");
 
-        arrayOfBlocks = methodOne.embeddingMethodOne(arrayOfBlocks, "Kemal tezce bu projeyi bitir");
+//        //TODO delete after testing
+        KohJao kohJao1 = new KohJao();
+        for (int i = 0; i<arrayOfBlocks.size(); i++){
+//            arrayOfBlocks.set(i, kohJao1.embedBitInBlock(arrayOfBlocks.get(i), true));
 
+            if (array.length==i){//TODO delete after testing extracted bits
+                System.out.println("");
+            }
+            System.out.print(kohJao1.extractBitFromBlock(arrayOfBlocks.get(i))+"  ");
+        }//TODO delete after testing
 
         double[][] imageArray = imageProcessing.mergeFromArrayOfBlocks(arrayOfBlocks, array.length, array[0].length);//TODO 14.05.2025 debug
 
@@ -72,21 +74,36 @@ public class ImageProcessingRunner implements CommandLineRunner {
 
         Mat finalImage = imageProcessing.replaceBlueChannel(mat, modifiedBlue);//TODO 14.05.2025 debug
 
-        String path = System.getProperty("user.home") + "/Desktop/OutputFiles/"+ generateRandomString(16) + ".jpeg";
+        String path = System.getProperty("user.home") + "/Desktop/OutputFiles/"+ generateRandomString(16) + ".png";
         imwrite(path, finalImage);
         System.out.println("Saved: " + path);
 
 
-        //Extracting text from photo
+        for (int i = 0; i < 10; i++){
+            System.out.println("");
+        }
+
+        // 2. Extracting text from photo
         File imageFileDecode = new File(fileToDecode);
         if (!imageFileDecode.exists()) {
             throw new IllegalArgumentException("File was not found: " + imageFileDecode.getAbsolutePath());
         }
         Mat matDecode = imageProcessing.photoToMat(imageFileDecode.getAbsolutePath());// returns mat object
-        Mat blueChannelDecode = imageProcessing.getBlueChannel(mat);//returns blue channel
-        double[][] arrayDecode = imageProcessing.matToDoubleArray(blueChannel);//returns double[][]
-        List<double[][]> arrayOfBlocksDecode = imageProcessing.splitIntoArrayOfBlocks(array);
+        Mat blueChannelDecode = imageProcessing.getBlueChannel(matDecode);//returns blue channel
+        double[][] arrayDecode = imageProcessing.matToDoubleArray(blueChannelDecode);//returns double[][]
+        List<double[][]> arrayOfBlocksDecode = imageProcessing.splitIntoArrayOfBlocks(arrayDecode);
+
+        //TODO заглушка для вывода содержимого
+        KohJao kohJao = new KohJao();
+        for (int i = 0; i<arrayOfBlocksDecode.size(); i++){
+            if (arrayDecode.length==i){//TODO delete after testing extracted bits
+                System.out.println("");
+            }
+            System.out.print(kohJao.extractBitFromBlock(arrayOfBlocksDecode.get(i))+"  ");
+        }
+
         System.out.println(methodOne.extractingMethodOne(arrayOfBlocksDecode));
+
 
 
 
@@ -147,4 +164,15 @@ public class ImageProcessingRunner implements CommandLineRunner {
                 {183, 190, 158, 119, 122, 166, 210, 237},
                 {167, 198, 167, 103, 91, 137, 195, 234}
         };
+
+                //TODO внедряем 0 в фото подряд во все блоки
+//        KohJao kohJao = new KohJao();
+//        for (int i = 0; i<arrayOfBlocks.size(); i++){
+//            arrayOfBlocks.set(i, kohJao.embedBitInBlock(arrayOfBlocks.get(i), false));
+//
+//            if (array.length==i){//TODO delete after testing extracted bits
+//                System.out.println("");
+//            }
+//            System.out.print(kohJao.extractBitFromBlock(arrayOfBlocks.get(i))+"  ");
+//        }
  */
