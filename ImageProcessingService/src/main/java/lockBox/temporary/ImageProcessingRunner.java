@@ -1,8 +1,8 @@
 package lockBox.temporary;
 
-import lockBox.Service.embedingMethods.MethodEmbedding;
-import lockBox.Service.impl.ImageProcessingImpl;
-import lockBox.Service.impl.KohJao;
+import lockBox.service.embedingMethods.MethodEmbedding;
+import lockBox.service.impl.ImageProcessingImpl;
+import lockBox.service.impl.KohJao;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -15,7 +15,7 @@ import static lockBox.Utils.SecureRandomStringGenerator.generateRandomString;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.imwrite;
 
 @Component
-public class ImageProcessingRunner implements CommandLineRunner {
+public class ImageProcessingRunner /*implements CommandLineRunner*/ {
     @Value("${image.file.path}")
     private String imageFilePath;
 
@@ -30,7 +30,7 @@ public class ImageProcessingRunner implements CommandLineRunner {
         this.methodOne = methodOne;
     }
 
-    @Override
+/*    @Override
     public void run(String... args) throws Exception {
 
 //        double[][] input1 = {
@@ -139,7 +139,7 @@ public class ImageProcessingRunner implements CommandLineRunner {
 //        boolean[] bitsFromString = textProcessing.bitStringToBitArray(bitString);
 //        String result = textProcessing.bitsToAscii(bitsFromString);
 //        System.out.println("Строка битов как ASCII: " + textProcessing.binaryToString(bitString));
-    }
+    }*/
 }
 
 /*

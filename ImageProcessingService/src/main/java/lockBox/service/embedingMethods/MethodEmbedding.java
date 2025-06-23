@@ -1,7 +1,7 @@
-package lockBox.Service.embedingMethods;
+package lockBox.service.embedingMethods;
 
-import lockBox.Service.impl.ImageProcessingImpl;
-import lockBox.Service.impl.KohJao;
+import lockBox.service.impl.ImageProcessingImpl;
+import lockBox.service.impl.KohJao;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

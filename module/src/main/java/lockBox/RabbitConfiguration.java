@@ -10,10 +10,10 @@ import static lockBox.RabbitQueue.*;
 
 @Configuration
 public class RabbitConfiguration {
-//    @Bean
-//    public MessageConverter jsonMessageConverter(){
-//        return new Jackson2JsonMessageConverter();
-//    }
+    @Bean
+    public MessageConverter jsonMessageConverter(){
+        return new Jackson2JsonMessageConverter();
+    }
 
     @Bean
     public Queue textMessageQueue(){

@@ -1,6 +1,6 @@
-package lockBox.Service.impl;
+package lockBox.service.impl;
 
-import lockBox.Service.TextProcessing;
+import lockBox.service.TextProcessing;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

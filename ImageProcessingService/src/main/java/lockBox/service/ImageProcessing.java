@@ -1,4 +1,4 @@
-package lockBox.Service;
+package lockBox.service;
 
 import org.bytedeco.opencv.opencv_core.Mat;
 

@@ -1,6 +1,6 @@
-package lockBox.Service.impl;
+package lockBox.service.impl;
 
-import lockBox.Service.VoiceProcessing;
+import lockBox.service.VoiceProcessing;
 
 import java.io.File;
 

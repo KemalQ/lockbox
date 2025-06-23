@@ -1,4 +1,4 @@
-package lockBox.Service;
+package lockBox.service;
 
 public interface VoiceProcessing {
     byte[] getDataBytes();

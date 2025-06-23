@@ -1,6 +1,6 @@
-package lockBox.Service.impl;
+package lockBox.service.impl;
 
-import lockBox.Service.ImageProcessing;
+import lockBox.service.ImageProcessing;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;

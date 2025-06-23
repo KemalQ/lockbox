@@ -1,4 +1,4 @@
-package lockBox.config;
+package lockBox.configuration;
 
 import lockBox.controller.TelegramBot;
 import org.springframework.context.annotation.Bean;

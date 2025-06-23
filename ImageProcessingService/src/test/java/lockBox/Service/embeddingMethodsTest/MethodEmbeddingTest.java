@@ -1,6 +1,6 @@
 package lockBox.Service.embeddingMethodsTest;
 
-import lockBox.Service.embedingMethods.MethodEmbedding;
+import lockBox.service.embedingMethods.MethodEmbedding;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;

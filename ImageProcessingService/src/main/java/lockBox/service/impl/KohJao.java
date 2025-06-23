@@ -1,6 +1,4 @@
-package lockBox.Service.impl;
-
-import static lockBox.Utils.printMatrix.printMatrix;
+package lockBox.service.impl;
 
 public class KohJao {
     /**

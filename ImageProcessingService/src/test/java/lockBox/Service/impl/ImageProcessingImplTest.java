@@ -1,5 +1,6 @@
 package lockBox.Service.impl;
 
+import lockBox.service.impl.ImageProcessingImpl;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;

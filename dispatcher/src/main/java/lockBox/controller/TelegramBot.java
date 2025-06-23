@@ -22,8 +22,10 @@ import java.util.List;
 public class TelegramBot extends TelegramLongPollingBot {
     @Value("${telegram.bot.username}")
     private String userName;
+
     @Value("${telegram.bot.token}")
     private String token;
+
     private UpdateController updateController;
 
     public TelegramBot(UpdateController updateController){
@@ -40,32 +42,25 @@ public class TelegramBot extends TelegramLongPollingBot {
         return token;
     }
     @Override
-    public void onUpdateReceived(Update update) {
-        var message = update.getMessage();
-        String txt = message.getText();
-        log.info("Получено сообщение: {}", txt);
-
-        var response = new SendMessage();
-        response.setChatId(message.getChatId().toString());
-        response.setText("Hello from bot");
-        sendAnswerMessage(response);
+    public void onUpdateReceived(Update update) {// 1. Processing received updates-> UpdateController.processUpdate()
+        updateController.processUpdate(update);
     }
-    public void sendAnswerMessage(SendMessage message) {
+    public void sendAnswerMessage(SendMessage message) {// 8. Sending answer message
         if (message != null) {
             try{
-                ReplyKeyboardMarkup KeyboardMarkup = new ReplyKeyboardMarkup();
-                List<KeyboardRow> keyboard = new ArrayList<>();
-                KeyboardRow row = new KeyboardRow();
-                for(int i = 1; i <= 30; i++)
-                {
-                    row.add(String.valueOf(i));
-                    if (i%5 == 0){
-                        keyboard.add(row);
-                        row = new KeyboardRow();
-                    }
-                }
-                KeyboardMarkup.setKeyboard(keyboard);
-                message.setReplyMarkup(KeyboardMarkup);
+//                ReplyKeyboardMarkup KeyboardMarkup = new ReplyKeyboardMarkup();//TODO implement after adding 30 methods
+//                List<KeyboardRow> keyboard = new ArrayList<>();
+//                KeyboardRow row = new KeyboardRow();
+//                for(int i = 1; i <= 30; i++)
+//                {
+//                    row.add(String.valueOf(i));
+//                    if (i%5 == 0){
+//                        keyboard.add(row);
+//                        row = new KeyboardRow();
+//                    }
+//                }
+//                KeyboardMarkup.setKeyboard(keyboard);
+//                message.setReplyMarkup(KeyboardMarkup);
 
                 execute(message);
             } catch (TelegramApiException e){

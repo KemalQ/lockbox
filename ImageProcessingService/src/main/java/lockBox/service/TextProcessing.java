@@ -1,4 +1,4 @@
-package lockBox.Service;
+package lockBox.service;
 
 public interface TextProcessing {
     public String bitsToAscii(boolean[] bits);//array of bits to ASCII
