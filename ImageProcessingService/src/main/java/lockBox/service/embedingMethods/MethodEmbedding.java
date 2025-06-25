@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -157,20 +159,42 @@ public class MethodEmbedding {
     }
 
 
-    private String toBinary(String message){//Преобразование строки в binary строку
+    //TODO Working only with ASCII
+//    public String toBinary(String message){//Преобразование строки в binary строку
+//        StringBuilder binary = new StringBuilder();
+//        for (char c : message.toCharArray()) {
+//            binary.append(String.format("%8s", Integer.toBinaryString(c)).replace(' ', '0'));
+//        }
+//        return binary.toString();
+//    }
+//    public String fromBinary(String binary) {//Преобразование из binary в строку
+//        StringBuilder text = new StringBuilder();
+//        for (int i = 0; i + 8 <= binary.length(); i += 8) {
+//            String byteStr = binary.substring(i, i + 8);
+//            int charCode = Integer.parseInt(byteStr, 2);
+//            text.append((char) charCode);
+//        }
+//        return text.toString();
+//    }
+    //TODO WORKS WITH UTF-8 SUPPORTS ENGLISH, UKRAINIAN, TURKISH, ARABIC, RUSSIAN, HINDI
+    public String toBinary(String message) {
+        byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
         StringBuilder binary = new StringBuilder();
-        for (char c : message.toCharArray()) {
-            binary.append(String.format("%8s", Integer.toBinaryString(c)).replace(' ', '0'));
+        for (byte b : bytes) {
+            binary.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
         }
         return binary.toString();
     }
-    private String fromBinary(String binary) {//Преобразование из binary в строку
-        StringBuilder text = new StringBuilder();
-        for (int i = 0; i + 8 <= binary.length(); i += 8) {
+
+    public String fromBinary(String binary) {
+        int len = binary.length();
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        for (int i = 0; i + 8 <= len; i += 8) {
             String byteStr = binary.substring(i, i + 8);
-            int charCode = Integer.parseInt(byteStr, 2);
-            text.append((char) charCode);
+            int byteVal = Integer.parseInt(byteStr, 2);
+            byteStream.write(byteVal);
         }
-        return text.toString();
+        return new String(byteStream.toByteArray(), StandardCharsets.UTF_8);
     }
+
 }

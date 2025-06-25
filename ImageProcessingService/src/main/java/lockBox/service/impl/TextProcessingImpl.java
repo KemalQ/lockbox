@@ -58,14 +58,4 @@ public class TextProcessingImpl implements TextProcessing {
                 .collect(Collectors.joining());
     }
 
-//    public boolean[] decimalLengthToBynary(boolean[] decimalLength){
-//        boolean[] bynaryLength;
-//        for (int i = 0; i < decimalLength.length; i++){
-//
-//        }
-//        return bynaryLength;
-//    }
-//    public char[] text(){
-//
-//    }
 }

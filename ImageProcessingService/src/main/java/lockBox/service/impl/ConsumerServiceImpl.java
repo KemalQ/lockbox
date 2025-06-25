@@ -2,6 +2,7 @@ package lockBox.service.impl;
 
 import lockBox.service.ConsumerService;
 import lockBox.service.ProducerService;
+import lockBox.service.embedingMethods.MethodEmbedding;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,14 @@ public class ConsumerServiceImpl implements ConsumerService {
         var message = update.getMessage();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getChatId().toString());
-        sendMessage.setText("Hello from ImageProcessingService");
+        //TODO 25.06.2025
+        var textToBinary = update.getMessage().getText();
+        MethodEmbedding methodEmbedding = new MethodEmbedding();
+        textToBinary = methodEmbedding.toBinary(textToBinary);
+        var binaryToText = methodEmbedding.fromBinary(textToBinary);
+
+        sendMessage.setText("Hello from ImageProcessingService. Your text in binary is: "
+                + textToBinary+ "\n " + binaryToText);
         producerService.produceTextAnswer(sendMessage);
     }
 
