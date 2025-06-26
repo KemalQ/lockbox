@@ -1,12 +1,10 @@
 package lockBox.service.impl;
 
 import lockBox.service.ConsumerService;
-import lockBox.service.ProducerService;
-import lockBox.service.embedingMethods.MethodEmbedding;
+import lockBox.service.MainService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import static lockBox.RabbitQueue.*;
@@ -14,29 +12,17 @@ import static lockBox.RabbitQueue.*;
 @Service
 @Slf4j
 public class ConsumerServiceImpl implements ConsumerService {
-    private final ProducerService producerService;
+    private final MainService mainService;
 
-    public ConsumerServiceImpl(ProducerService producerService){
-        this.producerService = producerService;
+    public ConsumerServiceImpl(MainService mainService){
+        this.mainService = mainService;
     }
 
     @Override
     @RabbitListener(queues = TEXT_MESSAGE_UPDATE)
     public void consumeTextMessageUpdates(Update update) {
         log.debug("ImageProcessingService: Text message is received");
-
-        var message = update.getMessage();
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(message.getChatId().toString());
-        //TODO 25.06.2025
-        var textToBinary = update.getMessage().getText();
-        MethodEmbedding methodEmbedding = new MethodEmbedding();
-        textToBinary = methodEmbedding.toBinary(textToBinary);
-        var binaryToText = methodEmbedding.fromBinary(textToBinary);
-
-        sendMessage.setText("Hello from ImageProcessingService. Your text in binary is: "
-                + textToBinary+ "\n " + binaryToText);
-        producerService.produceTextAnswer(sendMessage);
+        mainService.processTextMessage(update);
     }
 
     @Override

@@ -1,26 +1,28 @@
 package lockBox.service.embedingMethods;
 
-import lockBox.service.impl.ImageProcessingImpl;
+import lockBox.service.TextProcessing;
 import lockBox.service.impl.KohJao;
+import lockBox.service.impl.TextProcessingImpl;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
 @Data
 @Service
 public class MethodEmbedding {
-    public MethodEmbedding() {}
+    private final TextProcessing textProcessing;
+    private final KohJao kohJao;
+
+    public MethodEmbedding(TextProcessing textProcessing, KohJao kohJao) {
+        this.textProcessing = textProcessing;
+        this.kohJao = kohJao;
+    }
 
     public List<double[][]> embeddingMethodOne(List<double[][]> arrayOfBlocks, String text){
-        KohJao kohJao = new KohJao();
-        ImageProcessingImpl imageProcessing = new ImageProcessingImpl();
 
-        String binaryMessage = toBinary(text);
+        String binaryMessage = textProcessing.toBinary(text);
         String binaryLength = String.format("%10s", Integer.toBinaryString(binaryMessage.length())).replace(' ', '0');
 
         // 1. флаг наличия сообщения
@@ -83,8 +85,6 @@ public class MethodEmbedding {
     }
 
     public String extractingMethodOne(List<double[][]> arrayOfBlocks) {
-        KohJao kohJao = new KohJao();
-
         //1. Чтение флага "сообщение есть"
         int trueCount = 0;
         for (int i = 0; i < 3; i++) {
@@ -113,9 +113,9 @@ public class MethodEmbedding {
                 if (bit == null) return null;
                 binaryMessage.append(bit ? '1' : '0');
             }
-            log.info("MethodEmbedding - extractingMethodOne - fromBinaryToStringMessage: " + fromBinary(binaryMessage.toString()));//TODO delete after checking 01.06.2025
+            log.info("MethodEmbedding - extractingMethodOne - fromBinaryToStringMessage: " + textProcessing.fromBinary(binaryMessage.toString()));//TODO delete after checking 01.06.2025
             // Расшифровка бинарного текста в строку
-            return fromBinary(binaryMessage.toString());
+            return textProcessing.fromBinary(binaryMessage.toString());
         }
         else return null;
 
@@ -176,25 +176,6 @@ public class MethodEmbedding {
 //        }
 //        return text.toString();
 //    }
-    //TODO WORKS WITH UTF-8 SUPPORTS ENGLISH, UKRAINIAN, TURKISH, ARABIC, RUSSIAN, HINDI
-    public String toBinary(String message) {
-        byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
-        StringBuilder binary = new StringBuilder();
-        for (byte b : bytes) {
-            binary.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
-        }
-        return binary.toString();
-    }
 
-    public String fromBinary(String binary) {
-        int len = binary.length();
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        for (int i = 0; i + 8 <= len; i += 8) {
-            String byteStr = binary.substring(i, i + 8);
-            int byteVal = Integer.parseInt(byteStr, 2);
-            byteStream.write(byteVal);
-        }
-        return new String(byteStream.toByteArray(), StandardCharsets.UTF_8);
-    }
 
 }

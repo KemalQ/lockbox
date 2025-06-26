@@ -1,5 +1,8 @@
 package lockBox.service.impl;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class KohJao {
     /**
      * Встраивает один бит информации в блок изображения 8x8 пикселей
@@ -10,7 +13,11 @@ public class KohJao {
      * @return блок с встроенным битом информации
      */
 
-    ImageProcessingImpl imageProcessing = new ImageProcessingImpl();
+    private final ImageProcessingImpl imageProcessing;
+
+    public KohJao(ImageProcessingImpl imageProcessing) {
+        this.imageProcessing = imageProcessing;
+    }
 
     public double[][] embedBitInBlock(double[][] block, boolean bit) {
         //System.out.println("Matrix before DCT:");//TODO delete after checking

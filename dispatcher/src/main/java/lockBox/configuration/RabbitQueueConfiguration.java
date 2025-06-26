@@ -7,7 +7,6 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 
 import static lockBox.RabbitQueue.*;
-import static lockBox.module.RabbitQueue.*;
 
 @Configuration
 public class RabbitQueueConfiguration {

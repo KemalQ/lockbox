@@ -1,11 +1,38 @@
 package lockBox.service.impl;
 
 import lockBox.service.TextProcessing;
+import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@Service
 public class TextProcessingImpl implements TextProcessing {
+    //TODO WORKS WITH UTF-8 SUPPORTS ENGLISH, UKRAINIAN, TURKISH, ARABIC, RUSSIAN, HINDI
+    public String toBinary(String message) {
+        byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
+        StringBuilder binary = new StringBuilder();
+        for (byte b : bytes) {
+            binary.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
+        }
+        return binary.toString();
+    }
+
+    public String fromBinary(String binary) {
+        int len = binary.length();
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        for (int i = 0; i + 8 <= len; i += 8) {
+            String byteStr = binary.substring(i, i + 8);
+            int byteVal = Integer.parseInt(byteStr, 2);
+            byteStream.write(byteVal);
+        }
+        return new String(byteStream.toByteArray(), StandardCharsets.UTF_8);
+    }
+
+
+
     public String bitsToAscii(boolean[] bits) {//TODO переводит массив битов true или false в String ASCI, не использовать
         if (bits.length % 8 != 0) {
             throw new IllegalArgumentException("The length of the bit array must be a multiple of 8");
@@ -57,5 +84,6 @@ public class TextProcessingImpl implements TextProcessing {
                 .map(Character::toString)
                 .collect(Collectors.joining());
     }
+
 
 }
