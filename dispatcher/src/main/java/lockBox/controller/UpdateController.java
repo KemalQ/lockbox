@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import static lockBox.RabbitQueue.*;
 
+//Dispatcher
 @Controller
 @Slf4j
 public class UpdateController {//distribute incoming messages from the telegram bot
@@ -48,6 +49,18 @@ public class UpdateController {//distribute incoming messages from the telegram 
         }
     }
 
+    private void processPhotoMessage(Update update) {// 4.
+        updateProducer.produce(PHOTO_MESSAGE_UPDATE, update);
+        var sendMessage = messageUtils.generateSendMessageWithText(update, "Image received! Loading...");//TODO experıment delete after
+        setFileReceivedView(update);//to prevent users nervous and attempt to send the same photo.
+    }
+    private void processDocMessage(Update update) {// 4.
+        updateProducer.produce(DOC_MESSAGE_UPDATE, update);
+        setFileReceivedView(update);//to prevent users nervous and attempt to send the same document.
+    }
+    private void processTextMessage(Update update) {// 4.
+        updateProducer.produce(TEXT_MESSAGE_UPDATE, update);
+    }
     private void setUnsupportedMessageTypeView(Update update) {
         var sendMessage = messageUtils.generateSendMessageWithText(update, "Unsupported message type!");
         setView(sendMessage);
@@ -57,19 +70,9 @@ public class UpdateController {//distribute incoming messages from the telegram 
                 "File received! Loadind...");
         setView(sendMessage);// 6. Sending answer message in SendMessage format->(chatId, text)
     }
+
+
     public void setView(SendMessage sendMessage) { // 7. Sending message to Telegrambot.sendAnswerMessage()
         telegramBot.sendAnswerMessage(sendMessage);
-    }
-    private void processPhotoMessage(Update update) {// 4.
-        updateProducer.produce(PHOTO_MESSAGE_UPDATE, update);
-        var sendMessage = messageUtils.generateSendMessageWithText(update, "Image received! Loading");//TODO experıment delete after
-        setFileReceivedView(update);//to prevent users nervous and attempt to send the same photo.
-    }
-    private void processDocMessage(Update update) {// 4.
-        updateProducer.produce(DOC_MESSAGE_UPDATE, update);
-        setFileReceivedView(update);//to prevent users nervous and attempt to send the same document.
-    }
-    private void processTextMessage(Update update) {// 4.
-        updateProducer.produce(TEXT_MESSAGE_UPDATE, update);
     }
 }

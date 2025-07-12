@@ -9,9 +9,11 @@ import lockBox.service.ProducerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import static lockBox.entity.enums.BotState.WAITING_FOR_ACTION;
 import static lockBox.entity.enums.UserState.BASIC_STATE;
 import static lockBox.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
 import static lockBox.service.enums.ServiceCommands.*;
@@ -33,10 +35,12 @@ public class MainServiceImpl implements MainService {
     @Override
     public void processTextMessage(Update update){
         saveRawData(update);
-        var appUser = findOrSaveAppUser(update);
-        var userState = appUser.getUserState();
+        var appUser = findOrSaveAppUser(update);//checking and saving user in db if he isn't there
+        var userState = appUser.getUserState();//is he in BASIC_STATE or WAIT_FOR_EMAIL_STATE?
         var text = update.getMessage().getText();
         var output = "";
+        var chatId = update.getMessage().getChatId();
+        var botState = appUser.getBotState();
 
         if (CANCEL.equals(text)){
             output = cancelProcess(appUser);
@@ -44,11 +48,12 @@ public class MainServiceImpl implements MainService {
             output = processServiceCommand(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)){
             //TODO 30.06.2025 add after account confirmation via email
-        } else {
+        }
+        
+        else {
             log.error("Unknown user state: " + userState);
             output = "Unknown error! Enter /help and try again later...";
         }
-        var chatId = update.getMessage().getChatId();
         sendAnswer(output, chatId);
     }
 
@@ -77,7 +82,7 @@ public class MainServiceImpl implements MainService {
         }
 
         //TODO Add document saving
-        var answer = "Document succesfully uploaded! Link to download: http://finteh.com/getDoc/123";
+        var answer = "Photo succesfully uploaded! Link to download: http://finteh.com/getDoc/123";
         sendAnswer(answer, chatId);
     }
 

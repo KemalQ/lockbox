@@ -17,7 +17,16 @@ public class UpdateProducerImpl implements UpdateProducer {
 
     @Override
     public void produce(String rabbitQueue, Update update) {
-        log.info(update.getMessage().getText());//TODO plug, delete after
+        if (update.getMessage().hasText()){//TODO plug, delete after
+            log.debug(update.getMessage().getText());
+        }
+        if (update.getMessage().hasPhoto()){//TODO plug, delete after
+            log.debug("photo message received");
+        }
+        if (update.getMessage().hasDocument()){//TODO plug, delete after
+            log.debug("Document message: ", update.getMessage().getDocument().getFileName());
+        }
+
         rabbitTemplate.convertAndSend(rabbitQueue, update);
     }
 }

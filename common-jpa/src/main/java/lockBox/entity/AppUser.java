@@ -1,6 +1,7 @@
 package lockBox.entity;
 
 import jakarta.persistence.*;
+import lockBox.entity.enums.BotState;
 import lockBox.entity.enums.UserState;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,4 +32,7 @@ public class AppUser {
 
     @Enumerated(EnumType.STRING)
     private UserState userState;
+
+    @Enumerated(EnumType.STRING)
+    private BotState botState;
 }

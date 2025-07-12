@@ -80,6 +80,12 @@
             <version>2.21.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>lockBox</groupId>
+            <artifactId>common-jpa</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <dependency><!--FIXING jakarta.validation.NoProviderFoundException -->
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
