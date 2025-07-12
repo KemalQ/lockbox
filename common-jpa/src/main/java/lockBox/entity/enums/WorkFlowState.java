@@ -1,12 +1,9 @@
 package lockBox.entity.enums;
 
-public enum BotState {
+public enum WorkFlowState {
     INITIAL_STATE,
-    WAITING_FOR_ACTION,
-    WAITING_FOR_IMAGE,
-    WAITING_FOR_TEXT,
-    WAITING_FOR_ALGORITHM,
-    PROCESSING
+    EMBEDDING,
+    EXTRACTING
 }
 
 /*

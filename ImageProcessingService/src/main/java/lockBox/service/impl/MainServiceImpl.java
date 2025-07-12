@@ -9,13 +9,13 @@ import lockBox.service.ProducerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-import static lockBox.entity.enums.BotState.WAITING_FOR_ACTION;
+import static lockBox.entity.enums.WorkFlowState.*;
 import static lockBox.entity.enums.UserState.BASIC_STATE;
 import static lockBox.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
+import static lockBox.entity.enums.WorkFlowStep.*;
 import static lockBox.service.enums.ServiceCommands.*;
 
 //ImageProcessingService
@@ -34,16 +34,18 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public void processTextMessage(Update update){
-        saveRawData(update);
+        saveRawData(update);//handle and save any incoming update
         var appUser = findOrSaveAppUser(update);//checking and saving user in db if he isn't there
+
         var userState = appUser.getUserState();//is he in BASIC_STATE or WAIT_FOR_EMAIL_STATE?
         var text = update.getMessage().getText();
         var output = "";
         var chatId = update.getMessage().getChatId();
-        var botState = appUser.getBotState();
+        var botState = appUser.getWorkFlowState();//TODO check this
 
         if (CANCEL.equals(text)){
             output = cancelProcess(appUser);
+
         } else if (BASIC_STATE.equals(userState)){
             output = processServiceCommand(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)){
@@ -131,6 +133,25 @@ public class MainServiceImpl implements MainService {
         }
     }
 
+    private String processUserBotStates(AppUser appUser){
+        if (INITIAL_STATE.equals(appUser.getWorkFlowState())){//
+
+        } else if (WAITING_FOR_ACTION.equals(appUser.getWorkFlowState())) {//waiting for embedding or extracting
+            return "Choose one of the this commands: \n/embedding\n/extracting";
+        } else if (WAITING_FOR_IMAGE.equals(appUser.getWorkFlowState())){//have to download image
+            return "Download your photo";
+        } else if (WAITING_FOR_TEXT.equals(appUser.getWorkFlowState())){
+            return "Enter the text you want to hide in photo: ";
+        } else if (WAITING_FOR_ALGORITHM.equals(appUser.getWorkFlowState())){
+            return "Enter one of the keyboard number: ";
+        } else if (PROCESSING.equals(appUser.getWorkFlowState())){
+            return "";
+        }
+        else return "check processUserBotStates. It doesn't works properly";
+
+        return "check processUserBotStates. It doesn't works properly";
+    }
+
     private String help() {//TODO 30.06.2025 ЗУПИНИВСЯ ТУТ
         return "Avaible command list:\n" +
                 "/cancel - cancel of current command\n" +
@@ -140,6 +161,7 @@ public class MainServiceImpl implements MainService {
     private AppUser findOrSaveAppUser(Update update){
         User telegramUser = update.getMessage().getFrom();
         AppUser persistentAppUser = appUserDAO.findAppUserByTelegramUserId(telegramUser.getId());
+
         if (persistentAppUser == null){
             AppUser transientAppUser = AppUser.builder().
                     telegramUserId(telegramUser.getId()).
@@ -148,14 +170,15 @@ public class MainServiceImpl implements MainService {
                     userName(telegramUser.getUserName()).
                     //TODO change default values after adding registration
                     isActive(true).
-                    userState(BASIC_STATE).
+                    userState(BASIC_STATE).         // устанавливаю по умолчанию
+                    workFlowState(INITIAL_STATE).   // устанавливаю по умолчанию, но нужно отредактировать
                     build();
-            return appUserDAO.save(transientAppUser);
+            return appUserDAO.save(transientAppUser); // сохраняю нового пользователя в бд
         }
         return persistentAppUser;
     }
 
-    private void saveRawData(Update update){
+    private void saveRawData(Update update){//to handle any incoming message
         RawData rawData = RawData.builder().
                 event(update).build();
         rawDataDAO.save(rawData);
