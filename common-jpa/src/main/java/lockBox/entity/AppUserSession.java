@@ -18,19 +18,25 @@ import lombok.NoArgsConstructor;
 public class AppUserSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "app_user_id")
+    private AppUser appUser;
+
+    private String inputText;//для временного хранения текста
+    private String inputNumber;//для временного хранения введенного числа
+
+    private boolean textReceived;//флаг наличия текста. Использовать с inputText
+    private boolean imageReceived;//флаг наличия фото. Использовать с inputNumber
 
     @Enumerated
     private WorkFlowState currentState;
 
     @Enumerated
-    private WorkFlowStep step;
+    private WorkFlowStep workFlowStep;
 
     @OneToOne
     private BinaryContent binaryContent;//FK
-
-    private String text;
-
-    private String number;
 
 }

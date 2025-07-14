@@ -1,5 +1,6 @@
 package lockBox.controller;
 
+import lockBox.service.FSMBotHandler;
 import lockBox.service.impl.UpdateProducerImpl;
 import lockBox.utils.MessageUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +17,12 @@ public class UpdateController {//distribute incoming messages from the telegram 
     private TelegramBot telegramBot;//no Dependancy Injection, connected via @PostConstruct
     private final MessageUtils messageUtils;//Dependancy Injection
     private final UpdateProducerImpl updateProducer;
+    private final FSMBotHandler fsmBotHandler;
 
-    public UpdateController(MessageUtils messageUtils, UpdateProducerImpl updateProducer) {
+    public UpdateController(MessageUtils messageUtils, UpdateProducerImpl updateProducer, FSMBotHandler fsmBotHandler) {
         this.messageUtils = messageUtils;
         this.updateProducer = updateProducer;
+        this.fsmBotHandler = fsmBotHandler;
     }
 
     public void registerBot(TelegramBot telegramBot){
@@ -31,7 +34,8 @@ public class UpdateController {//distribute incoming messages from the telegram 
             return;
         }
         if (update.hasMessage()){
-            distributeMessagesByType(update);
+            fsmBotHandler.check(update);
+            //distributeMessagesByType(update);
         } else {
             log.error("Unsupported message type is:  {}" , update);
         }

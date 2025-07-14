@@ -1,6 +1,6 @@
 package lockBox.entity.enums;
 
-public enum WorkFlowState {
+public enum WorkFlowState {//
     INITIAL_STATE,
     EMBEDDING,
     EXTRACTING
